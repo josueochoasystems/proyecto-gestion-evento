@@ -1,0 +1,3600 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title": "API de Gestión de Eventos",
+        "description": "Documentación de la API para el proyecto de gestión de eventos",
+        "contact": {
+            "email": "soporte@ejemplo.com"
+        },
+        "version": "1.0.0"
+    },
+    "servers": [
+        {
+            "url": "http://localhost:8000/api",
+            "description": "Servidor local"
+        }
+    ],
+    "paths": {
+        "/login": {
+            "post": {
+                "tags": [
+                    "Auth"
+                ],
+                "summary": "Iniciar sesión y obtener token",
+                "operationId": "5e9587cd76ee0b2916962ebe123eae5e",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "application/json": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "password"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "example": "admin@ejemplo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "12345678"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Token generado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "access_token": {
+                                            "type": "string",
+                                            "example": "eyJ0eXAiOiJKV1QiLCJh..."
+                                        },
+                                        "token_type": {
+                                            "type": "string",
+                                            "example": "Bearer"
+                                        },
+                                        "expires_in": {
+                                            "type": "integer",
+                                            "example": 31536000
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Credenciales inválidas"
+                    }
+                }
+            }
+        },
+        "/escuelas": {
+            "get": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Listar escuelas",
+                "description": "Devuelve todas las escuelas disponibles",
+                "operationId": "2b1d96c3b917ebfc83d72cb012a33463",
+                "responses": {
+                    "200": {
+                        "description": "Lista de escuelas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Escuela"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Crear una nueva escuela",
+                "description": "Crea una escuela con nombre y opcionalmente una foto",
+                "operationId": "346faad4f3a28512121dc66b5d73d031",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "facultad_id"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nombre de la escuela",
+                                        "type": "string",
+                                        "example": "Ingeniería"
+                                    },
+                                    "codigo": {
+                                        "description": "Código de la escuela",
+                                        "type": "string",
+                                        "example": "ING"
+                                    },
+                                    "foto": {
+                                        "description": "Imagen de la escuela (archivo opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "facultad_id": {
+                                        "description": "ID de la facultad asociada",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Escuela creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Escuela"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/escuelas/facultad/{facultadId}": {
+            "get": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Listar escuelas por facultad",
+                "description": "Devuelve todas las escuelas asociadas a una facultad específica",
+                "operationId": "8f7f9e3d0c6cb5db8d57388d9a0227ff",
+                "parameters": [
+                    {
+                        "name": "facultadId",
+                        "in": "path",
+                        "description": "ID de la facultad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de escuelas por facultad",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Escuela"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron escuelas para la facultad indicada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hay facultades para esta filial"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/escuelas/{id}": {
+            "get": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Obtener una escuela por ID",
+                "description": "Devuelve una escuela específica por su ID",
+                "operationId": "6a13660edd633b3630aa8b06f17695da",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la escuela",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Escuela encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Escuela"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Escuela no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Escuela no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Actualizar una escuela existente",
+                "description": "Permite actualizar el nombre de una escuela y opcionalmente su foto",
+                "operationId": "2d5fd55e962ea096b1d3b4cfdd269df7",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la escuela a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "facultad_id"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nombre de la escuela",
+                                        "type": "string",
+                                        "example": "Ingeniería"
+                                    },
+                                    "codigo": {
+                                        "description": "Código de la escuela",
+                                        "type": "string",
+                                        "example": "ING"
+                                    },
+                                    "foto": {
+                                        "description": "Imagen de la escuela (archivo opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "facultad_id": {
+                                        "description": "ID de la facultad asociada",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Escuela actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Escuela"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Escuela no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Escuela no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Eliminar una escuela",
+                "description": "Elimina una escuela por su ID",
+                "operationId": "754e67e4a58bc1abb6b3820115d56f57",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la escuela a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Escuela eliminada correctamente (sin contenido)"
+                    },
+                    "404": {
+                        "description": "Escuela no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Escuela no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/escuelas/paginated": {
+            "get": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Obtener escuelas paginadas",
+                "description": "Devuelve una lista paginada de escuelas",
+                "operationId": "getEscuelasPaginated",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página a obtener",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de escuelas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 57
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nombre": {
+                                                        "type": "string",
+                                                        "example": "Administrador"
+                                                    },
+                                                    "foto": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/foto.png",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parámetros inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/escuelas/search": {
+            "get": {
+                "tags": [
+                    "Escuelas"
+                ],
+                "summary": "Buscar escuelas con paginación",
+                "description": "Permite buscar escuelas por nombre con soporte de paginación",
+                "operationId": "0eb49a1217a2111a9c3af916588b1770",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda para filtrar escuelas",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Administrador"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página (por defecto 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda de escuelas con paginación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facultad"
+                                            }
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/facultades": {
+            "get": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Listar facultades",
+                "description": "Devuelve todos las facultades disponibles",
+                "operationId": "58f91da0e2c917d30548e37ea0a681d1",
+                "responses": {
+                    "200": {
+                        "description": "Lista de facultades",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Facultad"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Crear una nueva facultad",
+                "description": "Crea una facultad con nombre y opcionalmente una foto",
+                "operationId": "5408641f6336fb051b4adfd4243920b0",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nombre de la facultad",
+                                        "type": "string",
+                                        "example": "Ingeniería"
+                                    },
+                                    "codigo": {
+                                        "description": "Código de la facultad",
+                                        "type": "string",
+                                        "example": "ING"
+                                    },
+                                    "foto": {
+                                        "description": "Imagen de la facultad (archivo opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "filial_id": {
+                                        "description": "ID de la filial asociada",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Facultad creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Facultad"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/facultades/filial/{filialId}": {
+            "get": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Listar facultades por filial",
+                "description": "Devuelve todas las facultades asociadas a una filial específica",
+                "operationId": "752d3c39c6605ffe48f1b8acc7472704",
+                "parameters": [
+                    {
+                        "name": "filialId",
+                        "in": "path",
+                        "description": "ID de la filial",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de facultades por filial",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Facultad"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No se encontraron facultades para la filial indicada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No hay facultades para esta filial"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/facultades/{id}": {
+            "get": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Obtener una facultad por ID",
+                "description": "Devuelve una facultad específica por su ID",
+                "operationId": "fdd038f0941a45a982f4946a1be62c7a",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la facultad",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Facultad encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Facultad"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Facultad no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Facultad no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Actualizar una facultad existente",
+                "description": "Permite actualizar el nombre de una facultad y opcionalmente su foto",
+                "operationId": "7572a6d7c0d64e45c0535cc4085b2cac",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la facultad a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nombre de la facultad",
+                                        "type": "string",
+                                        "example": "Ingeniería"
+                                    },
+                                    "codigo": {
+                                        "description": "Código de la facultad",
+                                        "type": "string",
+                                        "example": "ING"
+                                    },
+                                    "foto": {
+                                        "description": "Imagen de la facultad (archivo opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "filial_id": {
+                                        "description": "ID de la filial asociada",
+                                        "type": "integer",
+                                        "example": 1
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Facultad actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Facultad"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Facultad no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Facultad no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Eliminar una facultad",
+                "description": "Elimina una facultad por su ID",
+                "operationId": "10f73686c95d28bd7b1c1805df362b01",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la facultad a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Facultad eliminada correctamente (sin contenido)"
+                    },
+                    "404": {
+                        "description": "Facultad no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Facultad no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/facultades/paginated": {
+            "get": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Obtener facultades paginadas",
+                "description": "Devuelve una lista paginada de facultades",
+                "operationId": "getFacultadesPaginated",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página a obtener",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de facultades",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 57
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nombre": {
+                                                        "type": "string",
+                                                        "example": "Administrador"
+                                                    },
+                                                    "foto": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/foto.png",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parámetros inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/facultades/search": {
+            "get": {
+                "tags": [
+                    "Facultades"
+                ],
+                "summary": "Buscar roles con paginación",
+                "description": "Permite buscar facultades por nombre con soporte de paginación",
+                "operationId": "2000688f75307b13d4a18b82ca1d047b",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda para filtrar facultades",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Administrador"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página (por defecto 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda de facultades con paginación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Facultad"
+                                            }
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ponencias": {
+            "get": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Listar ponencias",
+                "description": "Devuelve todas las ponencias registradas",
+                "operationId": "a9d91d5eb81e5a7860d096bff6cff1b8",
+                "responses": {
+                    "200": {
+                        "description": "Lista de ponencias",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Ponencia"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Crear una nueva ponencia",
+                "description": "Crea una ponencia con todos sus campos y archivos opcionales",
+                "operationId": "2d07983874daaec673ad56c33cca8fc2",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre",
+                                    "eventoId",
+                                    "categoriaId",
+                                    "ponente",
+                                    "codigoQr"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Impacto de la IA"
+                                    },
+                                    "eventoId": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "categoriaId": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "ponente": {
+                                        "type": "string",
+                                        "example": "Dr. Juan Pérez"
+                                    },
+                                    "institucion": {
+                                        "type": "string",
+                                        "example": "UPeU",
+                                        "nullable": true
+                                    },
+                                    "archivoPresentacion": {
+                                        "description": "Archivo PDF de la presentación",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "foto": {
+                                        "description": "Foto opcional de la ponencia",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "codigoQr": {
+                                        "type": "string",
+                                        "example": "QR-ABC123"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Ponencia creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Ponencia"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ponencias/{id}": {
+            "get": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Obtener una ponencia por ID",
+                "description": "Devuelve una ponencia específica por su ID",
+                "operationId": "6ddfa7318d452ee7bb6bbb6a7d56de71",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la ponencia",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ponencia encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Ponencia"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ponencia no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Ponencia no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Actualizar una ponencia",
+                "description": "Permite actualizar los datos de una ponencia existente",
+                "operationId": "fb544869e0a418edb4f370789dc324d4",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la ponencia a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 5
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "properties": {
+                                    "nombre": {
+                                        "type": "string",
+                                        "example": "Ponencia actualizada"
+                                    },
+                                    "eventoId": {
+                                        "type": "integer",
+                                        "example": 2
+                                    },
+                                    "categoriaId": {
+                                        "type": "integer",
+                                        "example": 1
+                                    },
+                                    "ponente": {
+                                        "type": "string",
+                                        "example": "Mg. Felipe Ramos"
+                                    },
+                                    "institucion": {
+                                        "type": "string",
+                                        "example": "UNSAAC"
+                                    },
+                                    "archivoPresentacion": {
+                                        "description": "Nuevo PDF de la presentación",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "foto": {
+                                        "description": "Nueva foto opcional",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "codigoQr": {
+                                        "type": "string",
+                                        "example": "QR-XYZ999"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Ponencia actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Ponencia"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Ponencia no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Eliminar una ponencia",
+                "description": "Elimina una ponencia por su ID",
+                "operationId": "68318179804614c326082518a84c5363",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la ponencia a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 7
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Ponencia eliminada exitosamente"
+                    },
+                    "404": {
+                        "description": "Ponencia no encontrada"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ponencias/paginated": {
+            "get": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Obtener ponencias paginadas",
+                "description": "Devuelve una lista paginada de ponencias",
+                "operationId": "69747463673c8e7ed6583c66dd861034",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Página a visualizar",
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad por página",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de ponencias"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/ponencias/search": {
+            "get": {
+                "tags": [
+                    "Ponencias"
+                ],
+                "summary": "Buscar ponencias",
+                "description": "Permite buscar ponencias por nombre, ponente o institución",
+                "operationId": "ce781e69966cd3c6e157c5b2414650a4",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "schema": {
+                            "type": "string",
+                            "example": "IA"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Resultados por página",
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados obtenidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/roles": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Listar roles",
+                "description": "Devuelve todos los roles disponibles",
+                "operationId": "cf21c18995591a0659400f8e2b60b3a4",
+                "responses": {
+                    "200": {
+                        "description": "Lista de roles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Role"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Crear un nuevo rol",
+                "description": "Crea un rol con nombre y opcionalmente una foto",
+                "operationId": "0decba9573d3dc0d99fcd291d354ac95",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nombre del rol",
+                                        "type": "string",
+                                        "example": "Administrador"
+                                    },
+                                    "foto": {
+                                        "description": "Imagen del rol (archivo opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Rol creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/roles/{id}": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Obtener un rol por ID",
+                "description": "Devuelve un rol específico por su ID",
+                "operationId": "b77425883a1dd64d8604f978e674b11f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del rol",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Rol encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rol no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rol no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Actualizar un rol existente",
+                "description": "Permite actualizar el nombre de un rol y opcionalmente su foto",
+                "operationId": "8dec5372db4d540090af56deb196f30b",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del rol a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nuevo nombre del rol",
+                                        "type": "string",
+                                        "example": "Administrador actualizado"
+                                    },
+                                    "foto": {
+                                        "description": "Nueva imagen del rol (opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Rol actualizado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Role"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Rol no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rol no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Eliminar un rol",
+                "description": "Elimina un rol por su ID",
+                "operationId": "ac13dc4e962004238b39cce0a5e3dd5f",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del rol a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Rol eliminado correctamente (sin contenido)"
+                    },
+                    "404": {
+                        "description": "Rol no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Rol no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/roles/paginated": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Obtener roles paginados",
+                "description": "Devuelve una lista paginada de roles",
+                "operationId": "getRolesPaginated",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página a obtener",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista paginada de roles",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 57
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "properties": {
+                                                    "id": {
+                                                        "type": "integer",
+                                                        "example": 1
+                                                    },
+                                                    "nombre": {
+                                                        "type": "string",
+                                                        "example": "Administrador"
+                                                    },
+                                                    "foto": {
+                                                        "type": "string",
+                                                        "example": "https://example.com/foto.png",
+                                                        "nullable": true
+                                                    }
+                                                },
+                                                "type": "object"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Parámetros inválidos"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/roles/search": {
+            "get": {
+                "tags": [
+                    "Roles"
+                ],
+                "summary": "Buscar roles con paginación",
+                "description": "Permite buscar roles por nombre con soporte de paginación",
+                "operationId": "fed59eaf6d73b49bc366d55e7dc4ceb9",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda para filtrar roles",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "Administrador"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página (por defecto 10)",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda de roles con paginación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Role"
+                                            }
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 3
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/paginated": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Listar usuarios",
+                "description": "Obtiene una lista paginada de usuarios, con opción de filtrar por rol.",
+                "operationId": "getUsers",
+                "parameters": [
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Filtra los usuarios por rol (por ejemplo: ROLE_ESTUDIANTE, ROLE_JURADO, ROLE_PONENTE)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ROLE_ESTUDIANTE"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página para la paginación",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de usuarios por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Listado de usuarios obtenido correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Información de paginación",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 5
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 47
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "links": {
+                                            "description": "Enlaces de navegación",
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "example": "http://api.test/api/users?page=1"
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "example": "http://api.test/api/users?page=5"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "example": "http://api.test/api/users?page=2"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/search": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Buscar usuarios",
+                "description": "Busca usuarios por nombre, apellidos o correo electrónico. Permite filtrar por rol y paginar los resultados.",
+                "operationId": "searchUsers",
+                "parameters": [
+                    {
+                        "name": "term",
+                        "in": "query",
+                        "description": "Término de búsqueda (nombre, apellido o correo)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "juan.perez@upeu.edu.pe"
+                        }
+                    },
+                    {
+                        "name": "role",
+                        "in": "query",
+                        "description": "Filtra usuarios por rol (por ejemplo: ROLE_ESTUDIANTE, ROLE_JURADO, ROLE_PONENTE)",
+                        "required": false,
+                        "schema": {
+                            "type": "string",
+                            "example": "ROLE_PONENTE"
+                        }
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página de resultados",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de usuarios por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "example": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de la búsqueda de usuarios",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/User"
+                                            }
+                                        },
+                                        "meta": {
+                                            "description": "Información de paginación",
+                                            "properties": {
+                                                "current_page": {
+                                                    "type": "integer",
+                                                    "example": 1
+                                                },
+                                                "last_page": {
+                                                    "type": "integer",
+                                                    "example": 3
+                                                },
+                                                "per_page": {
+                                                    "type": "integer",
+                                                    "example": 10
+                                                },
+                                                "total": {
+                                                    "type": "integer",
+                                                    "example": 25
+                                                }
+                                            },
+                                            "type": "object"
+                                        },
+                                        "links": {
+                                            "description": "Enlaces de navegación",
+                                            "properties": {
+                                                "first": {
+                                                    "type": "string",
+                                                    "example": "http://api.test/api/users/search?page=1"
+                                                },
+                                                "last": {
+                                                    "type": "string",
+                                                    "example": "http://api.test/api/users/search?page=3"
+                                                },
+                                                "prev": {
+                                                    "type": "string",
+                                                    "example": null,
+                                                    "nullable": true
+                                                },
+                                                "next": {
+                                                    "type": "string",
+                                                    "example": "http://api.test/api/users/search?page=2"
+                                                }
+                                            },
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users/{id}": {
+            "get": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Obtener un usuario por ID",
+                "description": "Devuelve los datos detallados de un usuario específico mediante su identificador único.",
+                "operationId": "getUserById",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario que se desea consultar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario encontrado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado — el token de autenticación no fue provisto o es inválido"
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Actualizar información de un usuario",
+                "description": "Actualiza los datos de un usuario existente, incluyendo su información personal, académica y rol.",
+                "operationId": "updateUser",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 15
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "description": "Datos actualizados del usuario (multipart/form-data)",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "escuela_id",
+                                    "nombres",
+                                    "apellidos",
+                                    "tipo_documento",
+                                    "numero_documento",
+                                    "correo_electronico",
+                                    "fecha_nacimiento"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuario.actualizado@ejemplo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "nuevaClave123",
+                                        "nullable": true
+                                    },
+                                    "escuela_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "jurado"
+                                    },
+                                    "nombres": {
+                                        "type": "string",
+                                        "example": "María"
+                                    },
+                                    "apellidos": {
+                                        "type": "string",
+                                        "example": "Fernández López"
+                                    },
+                                    "tipo_documento": {
+                                        "type": "string",
+                                        "example": "DNI"
+                                    },
+                                    "numero_documento": {
+                                        "type": "string",
+                                        "example": "78945612"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "999888777",
+                                        "nullable": true
+                                    },
+                                    "direccion": {
+                                        "type": "string",
+                                        "example": "Calle Los Sauces 456",
+                                        "nullable": true
+                                    },
+                                    "pais": {
+                                        "type": "string",
+                                        "example": "Peru",
+                                        "nullable": true
+                                    },
+                                    "religion": {
+                                        "type": "string",
+                                        "example": "Adventista",
+                                        "nullable": true
+                                    },
+                                    "correo_electronico": {
+                                        "type": "string",
+                                        "example": "maria.fernandez@ejemplo.com"
+                                    },
+                                    "correo_institucional": {
+                                        "type": "string",
+                                        "example": "maria.fernandez@ejemplo.com"
+                                    },
+                                    "fecha_nacimiento": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1998-02-14"
+                                    },
+                                    "foto_perfil": {
+                                        "description": "Archivo de imagen del perfil (jpg, png, etc.)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "codigo_universitario": {
+                                        "type": "string",
+                                        "example": "20224567",
+                                        "nullable": true
+                                    },
+                                    "especialidad": {
+                                        "type": "string",
+                                        "example": "Ingeniería de Software",
+                                        "nullable": true
+                                    },
+                                    "biografia": {
+                                        "type": "string",
+                                        "example": "Ponente en conferencias internacionales de tecnología educativa",
+                                        "nullable": true
+                                    },
+                                    "ponencia_id": {
+                                        "description": "ID de la ponencia asignada al ponente",
+                                        "type": "integer",
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario actualizado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos o incompletos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en los datos enviados"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Eliminar un usuario",
+                "description": "Elimina un usuario existente por su ID.",
+                "operationId": "c8a573915c68d380f0a6611a7234c2fb",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID del usuario a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Usuario eliminado correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario eliminado correctamente"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Usuario no encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Usuario no encontrado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "No autorizado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "No autorizado"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/users": {
+            "post": {
+                "tags": [
+                    "Usuarios"
+                ],
+                "summary": "Crear información de un usuario",
+                "description": "Crea los datos de un usuario existente, incluyendo su información personal, académica y rol.",
+                "operationId": "createUser",
+                "requestBody": {
+                    "description": "Datos creados del usuario (multipart/form-data)",
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "email",
+                                    "escuela_id",
+                                    "nombres",
+                                    "apellidos",
+                                    "tipo_documento",
+                                    "numero_documento",
+                                    "correo_electronico",
+                                    "fecha_nacimiento"
+                                ],
+                                "properties": {
+                                    "email": {
+                                        "type": "string",
+                                        "format": "email",
+                                        "example": "usuario.actualizado@ejemplo.com"
+                                    },
+                                    "password": {
+                                        "type": "string",
+                                        "example": "nuevaClave123",
+                                        "nullable": true
+                                    },
+                                    "escuela_id": {
+                                        "type": "integer",
+                                        "example": 3
+                                    },
+                                    "role": {
+                                        "type": "string",
+                                        "example": "jurado"
+                                    },
+                                    "nombres": {
+                                        "type": "string",
+                                        "example": "María"
+                                    },
+                                    "apellidos": {
+                                        "type": "string",
+                                        "example": "Fernández López"
+                                    },
+                                    "tipo_documento": {
+                                        "type": "string",
+                                        "example": "DNI"
+                                    },
+                                    "numero_documento": {
+                                        "type": "string",
+                                        "example": "78945612"
+                                    },
+                                    "telefono": {
+                                        "type": "string",
+                                        "example": "999888777",
+                                        "nullable": true
+                                    },
+                                    "direccion": {
+                                        "type": "string",
+                                        "example": "Calle Los Sauces 456",
+                                        "nullable": true
+                                    },
+                                    "pais": {
+                                        "type": "string",
+                                        "example": "Peru",
+                                        "nullable": true
+                                    },
+                                    "religion": {
+                                        "type": "string",
+                                        "example": "Adventista",
+                                        "nullable": true
+                                    },
+                                    "correo_electronico": {
+                                        "type": "string",
+                                        "example": "maria.fernandez@ejemplo.com"
+                                    },
+                                    "correo_institucional": {
+                                        "type": "string",
+                                        "example": "maria.fernandez@ejemplo.com"
+                                    },
+                                    "fecha_nacimiento": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "1998-02-14"
+                                    },
+                                    "foto_perfil": {
+                                        "description": "Archivo de imagen del perfil (jpg, png, etc.)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    },
+                                    "codigo_universitario": {
+                                        "type": "string",
+                                        "example": "20224567",
+                                        "nullable": true
+                                    },
+                                    "especialidad": {
+                                        "type": "string",
+                                        "example": "Ingeniería de Software",
+                                        "nullable": true
+                                    },
+                                    "biografia": {
+                                        "type": "string",
+                                        "example": "Ponente en conferencias internacionales de tecnología educativa",
+                                        "nullable": true
+                                    },
+                                    "ponencia_id": {
+                                        "description": "ID de la ponencia asignada al ponente",
+                                        "type": "integer",
+                                        "example": 5,
+                                        "nullable": true
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Usuario creado exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/User"
+                                }
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Datos inválidos o incompletos",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Error en los datos enviados"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/filiales": {
+            "get": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Listar filiales",
+                "description": "Devuelve todos las filiales disponibles",
+                "operationId": "5de9e3819adf0e8f9c6a03711ddaed5f",
+                "responses": {
+                    "200": {
+                        "description": "Lista de filiales",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "type": "array",
+                                    "items": {
+                                        "$ref": "#/components/schemas/Filial"
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Error interno del servidor"
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Crear una nueva filial",
+                "description": "Crea una filial con nombre y opcionalmente una foto",
+                "operationId": "97b7eeafe5559056959f032ddcd17f87",
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nombre de la filial",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "direccion": {
+                                        "description": "Direccion",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "telefono": {
+                                        "description": "Telefono",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "email": {
+                                        "description": "email",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "foto": {
+                                        "description": "Imagen de la filial (archivo opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "201": {
+                        "description": "Filial creada exitosamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Filial"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/filiales/{id}": {
+            "get": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Obtener una filial por ID",
+                "description": "Devuelve una filial específica por su ID",
+                "operationId": "dede7b1c08146eb16309816da5144e55",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la filial",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Filial encontrado",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Filial"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Filial no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Filial no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "post": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Actualizar una filial existente",
+                "description": "Permite actualizar el nombre de una filial y opcionalmente su foto",
+                "operationId": "59acb9e1befcdd8ee61b92f9738f373e",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la filial a actualizar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "requestBody": {
+                    "required": true,
+                    "content": {
+                        "multipart/form-data": {
+                            "schema": {
+                                "required": [
+                                    "nombre"
+                                ],
+                                "properties": {
+                                    "nombre": {
+                                        "description": "Nuevo nombre de la filial",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "direccion": {
+                                        "description": "Direccion",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "telefono": {
+                                        "description": "Telefono",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "email": {
+                                        "description": "email",
+                                        "type": "string",
+                                        "example": "Example"
+                                    },
+                                    "foto": {
+                                        "description": "Nueva imagen de la filial (opcional)",
+                                        "type": "string",
+                                        "format": "binary"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Filial actualizada correctamente",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "$ref": "#/components/schemas/Filial"
+                                }
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "Filial no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Filial no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Error de validación",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "El campo nombre es obligatorio."
+                                        },
+                                        "errors": {
+                                            "type": "object"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            },
+            "delete": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Eliminar una filial",
+                "description": "Elimina una filial por su ID",
+                "operationId": "719ea95f40812c5d59be193d5422f541",
+                "parameters": [
+                    {
+                        "name": "id",
+                        "in": "path",
+                        "description": "ID de la filial a eliminar",
+                        "required": true,
+                        "schema": {
+                            "type": "integer",
+                            "example": 1
+                        }
+                    }
+                ],
+                "responses": {
+                    "204": {
+                        "description": "Filial eliminado correctamente (sin contenido)"
+                    },
+                    "404": {
+                        "description": "Filial no encontrada",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "message": {
+                                            "type": "string",
+                                            "example": "Filial no encontrada"
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/filiales/paginated": {
+            "get": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Obtener filiales paginadas",
+                "description": "Devuelve una lista de filiales con paginación.",
+                "operationId": "9faf909ee27f314623bfb9ff9447ce2b",
+                "parameters": [
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "Número de página a consultar",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 1
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Lista de filiales paginadas",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 50
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Filial"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        },
+        "/filiales/search": {
+            "get": {
+                "tags": [
+                    "Filiales"
+                ],
+                "summary": "Buscar filiales con paginación",
+                "description": "Busca filiales según un término y devuelve resultados paginados.",
+                "operationId": "ee96ccb3700ec9346296da72f40c7be4",
+                "parameters": [
+                    {
+                        "name": "q",
+                        "in": "query",
+                        "description": "Término de búsqueda",
+                        "required": false,
+                        "schema": {
+                            "type": "string"
+                        }
+                    },
+                    {
+                        "name": "per_page",
+                        "in": "query",
+                        "description": "Cantidad de resultados por página",
+                        "required": false,
+                        "schema": {
+                            "type": "integer",
+                            "default": 10
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Resultados de búsqueda paginados",
+                        "content": {
+                            "application/json": {
+                                "schema": {
+                                    "properties": {
+                                        "current_page": {
+                                            "type": "integer",
+                                            "example": 1
+                                        },
+                                        "per_page": {
+                                            "type": "integer",
+                                            "example": 10
+                                        },
+                                        "total": {
+                                            "type": "integer",
+                                            "example": 12
+                                        },
+                                        "data": {
+                                            "type": "array",
+                                            "items": {
+                                                "$ref": "#/components/schemas/Filial"
+                                            }
+                                        }
+                                    },
+                                    "type": "object"
+                                }
+                            }
+                        }
+                    }
+                },
+                "security": [
+                    {
+                        "bearerAuth": []
+                    }
+                ]
+            }
+        }
+    },
+    "components": {
+        "schemas": {
+            "Alumno": {
+                "title": "Alumno",
+                "description": "Datos de un alumno asociado al usuario",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 5
+                    },
+                    "userId": {
+                        "type": "integer",
+                        "example": 11
+                    },
+                    "codigoUniversitario": {
+                        "type": "string",
+                        "example": "20201234",
+                        "nullable": true
+                    },
+                    "carrera": {
+                        "type": "string",
+                        "example": "Ingeniería de Sistemas"
+                    }
+                },
+                "type": "object"
+            },
+            "Escuela": {
+                "title": "Escuela",
+                "description": "Escuela del sistema",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "facultad_id": {
+                        "type": "integer",
+                        "example": "1"
+                    },
+                    "foto": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/roles/admin.png"
+                    }
+                },
+                "type": "object"
+            },
+            "Facultad": {
+                "title": "Facultad",
+                "description": "Facultad del sistema",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "codigo": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "foto": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/roles/admin.png"
+                    },
+                    "filialId": {
+                        "type": "integer",
+                        "example": "1"
+                    }
+                },
+                "type": "object"
+            },
+            "Filial": {
+                "title": "Filial",
+                "description": "Filial del sistema",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "telefono": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "Example"
+                    },
+                    "foto": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/roles/admin.png"
+                    }
+                },
+                "type": "object"
+            },
+            "Jurado": {
+                "title": "Jurado",
+                "description": "Datos de un jurado asociado a un usuario y sus evaluaciones",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 7,
+                        "nullable": true
+                    },
+                    "userId": {
+                        "description": "Identificador del usuario que es jurado",
+                        "type": "integer",
+                        "example": 22,
+                        "nullable": true
+                    },
+                    "especialidad": {
+                        "description": "Especialidad principal del jurado",
+                        "type": "string",
+                        "example": "Inteligencia Artificial"
+                    }
+                },
+                "type": "object"
+            },
+            "Persona": {
+                "title": "Persona",
+                "description": "Datos de la persona asociada a un usuario",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 10
+                    },
+                    "userId": {
+                        "type": "integer",
+                        "example": 1,
+                        "nullable": true
+                    },
+                    "nombres": {
+                        "type": "string",
+                        "example": "Juan"
+                    },
+                    "apellidos": {
+                        "type": "string",
+                        "example": "Pérez García"
+                    },
+                    "tipoDocumento": {
+                        "type": "string",
+                        "example": "DNI"
+                    },
+                    "numeroDocumento": {
+                        "type": "string",
+                        "example": "12345678"
+                    },
+                    "telefono": {
+                        "type": "string",
+                        "example": "+51 987654321"
+                    },
+                    "direccion": {
+                        "type": "string",
+                        "example": "Av. Siempre Viva 123"
+                    },
+                    "correoElectronico": {
+                        "type": "string",
+                        "format": "email",
+                        "example": "juan.perez@ejemplo.com"
+                    },
+                    "fotoPerfil": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/usuarios/juan.png",
+                        "nullable": true
+                    },
+                    "fechaNacimiento": {
+                        "type": "string",
+                        "format": "date",
+                        "example": "1990-05-20"
+                    }
+                },
+                "type": "object"
+            },
+            "Ponencia": {
+                "title": "Ponencia",
+                "description": "Representación de una ponencia dentro del sistema",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Impacto de la Inteligencia Artificial en la Educación Superior"
+                    },
+                    "eventoId": {
+                        "description": "ID del evento asociado",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "categoriaId": {
+                        "description": "ID de la categoría de la ponencia",
+                        "type": "integer",
+                        "example": 2
+                    },
+                    "ponente": {
+                        "description": "Nombre del ponente",
+                        "type": "string",
+                        "example": "Dr. Juan Pérez"
+                    },
+                    "institucion": {
+                        "description": "Institución del ponente",
+                        "type": "string",
+                        "example": "Universidad Peruana Unión",
+                        "nullable": true
+                    },
+                    "archivoPresentacion": {
+                        "description": "Ruta del archivo PDF de la presentación",
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/ponencias/presentacion_123.pdf",
+                        "nullable": true
+                    },
+                    "foto": {
+                        "description": "Ruta de la foto relacionada a la ponencia",
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/ponencias/foto_ponencia_123.png",
+                        "nullable": true
+                    },
+                    "codigoQr": {
+                        "description": "Código QR generado para la ponencia",
+                        "type": "string",
+                        "example": "QR-ABC123456"
+                    }
+                },
+                "type": "object"
+            },
+            "Ponente": {
+                "title": "Ponente",
+                "description": "Datos del ponente asociado a un usuario y una ponencia",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 3,
+                        "nullable": true
+                    },
+                    "biografia": {
+                        "type": "string",
+                        "example": "Ingeniero con 10 años de experiencia en inteligencia artificial.",
+                        "nullable": true
+                    },
+                    "userId": {
+                        "type": "integer",
+                        "example": 12,
+                        "nullable": true
+                    },
+                    "ponenciaId": {
+                        "description": "Identificador de la ponencia asignada",
+                        "type": "integer",
+                        "example": 45
+                    }
+                },
+                "type": "object"
+            },
+            "Role": {
+                "title": "Role",
+                "description": "Rol del sistema",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "nombre": {
+                        "type": "string",
+                        "example": "Administrador"
+                    },
+                    "foto": {
+                        "type": "string",
+                        "format": "url",
+                        "example": "http://localhost/storage/roles/admin.png"
+                    }
+                },
+                "type": "object"
+            },
+            "User": {
+                "title": "Usuario",
+                "description": "Entidad que representa a un usuario del sistema, con sus datos básicos y relaciones asociadas.",
+                "properties": {
+                    "id": {
+                        "type": "integer",
+                        "example": 1
+                    },
+                    "email": {
+                        "type": "string",
+                        "example": "usuario@universidad.edu"
+                    },
+                    "password": {
+                        "type": "string",
+                        "example": "********"
+                    },
+                    "escuelaId": {
+                        "description": "ID de la escuela a la que pertenece el usuario",
+                        "type": "integer",
+                        "example": 3
+                    },
+                    "roleId": {
+                        "type": "integer",
+                        "example": 2,
+                        "nullable": true
+                    },
+                    "emailVerifiedAt": {
+                        "type": "string",
+                        "format": "date-time",
+                        "example": "2025-03-15T10:30:00Z",
+                        "nullable": true
+                    },
+                    "rememberToken": {
+                        "type": "string",
+                        "example": "xyz123token",
+                        "nullable": true
+                    },
+                    "persona": {
+                        "$ref": "#/components/schemas/Persona"
+                    },
+                    "role": {
+                        "$ref": "#/components/schemas/Role"
+                    },
+                    "alumno": {
+                        "$ref": "#/components/schemas/Alumno"
+                    },
+                    "jurado": {
+                        "$ref": "#/components/schemas/Jurado"
+                    },
+                    "ponente": {
+                        "$ref": "#/components/schemas/Ponente"
+                    }
+                },
+                "type": "object",
+                "example": {
+                    "id": 1,
+                    "email": "usuario@universidad.edu",
+                    "escuelaId": 3,
+                    "roleId": 2,
+                    "emailVerifiedAt": "2025-03-15T10:30:00Z",
+                    "persona": {
+                        "nombres": "Juan",
+                        "apellidos": "Pérez",
+                        "correoElectronico": "juan.perez@uni.edu"
+                    },
+                    "role": {
+                        "id": 2,
+                        "nombre": "ROLE_ESTUDIANTE"
+                    },
+                    "alumno": {
+                        "codigoUniversitario": "20201234",
+                        "carrera": "Ingeniería de Sistemas"
+                    },
+                    "jurado": null,
+                    "ponente": null
+                }
+            }
+        },
+        "securitySchemes": {
+            "bearerAuth": {
+                "type": "http",
+                "description": "Introduce el token de acceso obtenido al iniciar sesión con Laravel Passport",
+                "bearerFormat": "JWT",
+                "scheme": "bearer"
+            },
+            "sanctum": {
+                "type": "apiKey",
+                "description": "Enter token in format (Bearer <token>)",
+                "name": "Authorization",
+                "in": "header"
+            }
+        }
+    },
+    "tags": [
+        {
+            "name": "Auth",
+            "description": "Auth"
+        },
+        {
+            "name": "Escuelas",
+            "description": "Escuelas"
+        },
+        {
+            "name": "Facultades",
+            "description": "Facultades"
+        },
+        {
+            "name": "Ponencias",
+            "description": "Ponencias"
+        },
+        {
+            "name": "Roles",
+            "description": "Roles"
+        },
+        {
+            "name": "Usuarios",
+            "description": "Usuarios"
+        },
+        {
+            "name": "Filiales",
+            "description": "Filiales"
+        }
+    ]
+}
