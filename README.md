@@ -1,10 +1,10 @@
-# 🎓 Sistema de Gestión de Eventos Científicos
+# 🎓 Sistema de Gestión de Eventos
 
 Plataforma web y móvil para la gestión integral de eventos académicos (como jornadas científicas), con control de asistencia mediante códigos QR, categorización de ponencias y autenticación segura.
 
 ## 📌 Descripción del Proyecto
 
-El Sistema de Gestión de Eventos Científicos permite organizar, administrar y controlar jornadas académicas, congresos y seminarios, incluyendo:
+El Sistema de Gestión de Eventos permite organizar, administrar y controlar jornadas académicas, congresos y seminarios, incluyendo:
 
 Registro de participantes
 
@@ -136,7 +136,7 @@ Programación por fecha y horario
 
 Asignación de sala
 
-🏷 Gestión de Categorías
+### 🏷 Gestión de Categorías
 
 Categorías temáticas (Ej: Ingeniería, Salud, Educación)
 
@@ -224,7 +224,7 @@ php artisan serve
 
 ### 3️⃣ Ejecutar Frontend (React)
 
-cd frontend-web
+cd gestion-evento-react
 
 npm install
 
@@ -232,7 +232,7 @@ npm start
 
 
 ### 4️⃣ Ejecutar Aplicación Móvil (Flutter)
-cd mobile-app
+cd gestion_evento_flutter
 
 flutter pub get
 
